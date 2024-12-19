@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 description = "用于Rust跨平台获取设备ID的库"
 keywords = ["device", "id", "uuid", "android", "ios"]
+license = "MIT"
+readme = "README.md"
 
 [dependencies]
 cache-dir = "0.1.0"
