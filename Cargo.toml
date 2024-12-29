@@ -1,6 +1,6 @@
 [package]
 name = "device-id"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "用于Rust跨平台获取设备ID的库"
 keywords = ["device", "id", "uuid", "android", "ios"]
@@ -8,8 +8,8 @@ license = "MIT"
 readme = "README.md"
 
 [dependencies]
-cache-dir = "0.1.0"
-tracing = "0.1.41"
+cache-dir = "0.1.1"
+tracing ="0.1.41"
 
 [dependencies.uuid]
 features = ["v4", "serde", "fast-rng"]
