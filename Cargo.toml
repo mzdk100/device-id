@@ -1,6 +1,6 @@
 [package]
 name = "device-id"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 description = "用于Rust跨平台获取设备ID的库"
 keywords = ["device", "id", "uuid", "android", "ios"]
@@ -9,7 +9,7 @@ readme = "README.md"
 repository = "https://github.com/mzdk100/device-id.git"
 
 [dependencies]
-cache-dir = "0.1.2"
+cache-dir = "0.1.3"
 tracing ="0.1.41"
 
 [dependencies.uuid]
