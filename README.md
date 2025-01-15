@@ -30,14 +30,6 @@ println!("Device ID: {}", device_id);
 
 `get_device_id` 函数永远不会返回任何错误，如果无法从文件恢复设备ID则使用UUID V4算法重新生成。
 
-## 示例
-
-```rust
-use device_id::get_device_id;
-let device_id = get_device_id();
-println!("Device ID: {}", device_id);
-```
-
 ## 注意事项
 
 - 如果从文件中恢复设备ID失败，会记录错误信息并生成一个新的设备ID。
