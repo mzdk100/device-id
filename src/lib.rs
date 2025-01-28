@@ -25,7 +25,7 @@ enum DeviceIdError {
 /// 常量，存储UUID的文件名
 const ID_FILE_NAME: &str = "device.id";
 
-static ID_FILE: LazyLock<Result<Uuid, DeviceIdError>> = LazyLock::new(|| {
+fn try_get_device_id() -> Result<Uuid, DeviceIdError> {
     let path = get_cache_dir()
         .map_err(DeviceIdError::NoCacheDir)?
         .join(ID_FILE_NAME);
@@ -33,6 +33,32 @@ static ID_FILE: LazyLock<Result<Uuid, DeviceIdError>> = LazyLock::new(|| {
     let mut buf = Vec::with_capacity(16);
     file.read_to_end(&mut buf).map_err(DeviceIdError::NoFile)?;
     Ok(Uuid::from_slice(&buf).map_err(DeviceIdError::DataInvalid)?)
+}
+
+static ID_FILE: LazyLock<Uuid> = LazyLock::new(|| {
+    try_get_device_id().map_or_else(
+        |e| {
+            error!(
+                ?e,
+                "Can't restore the device id from file. Using new device id."
+            );
+            let new = Uuid::new_v4();
+            const ERROR_MSG: &str =
+                "Can't save device id to file, it will not be restored next time.";
+            match get_cache_dir() {
+                Ok(path) => match File::create(path.join(ID_FILE_NAME)) {
+                    Ok(mut file) => match file.write_all(new.as_bytes()) {
+                        Ok(_) => (),
+                        Err(e) => error!(?e, ERROR_MSG),
+                    },
+                    Err(e) => error!(?e, ERROR_MSG),
+                },
+                Err(e) => error!(?e, ERROR_MSG),
+            }
+            new
+        },
+        |i| i,
+    )
 });
 
 /// 获取设备ID的函数。
@@ -56,27 +82,5 @@ static ID_FILE: LazyLock<Result<Uuid, DeviceIdError>> = LazyLock::new(|| {
 /// println!("Device ID: {}", device_id);
 /// ```
 pub fn get_device_id() -> Uuid {
-    ID_FILE.as_ref().map_or_else(
-        |e| {
-            error!(
-                ?e,
-                "Can't restore the device id from file. Using new device id."
-            );
-            let new = Uuid::new_v4();
-            const ERROR_MSG: &str =
-                "Can't save device id to file, it will not be restored next time.";
-            match get_cache_dir() {
-                Ok(path) => match File::create(path.join(ID_FILE_NAME)) {
-                    Ok(mut file) => match file.write_all(new.as_bytes()) {
-                        Ok(_) => (),
-                        Err(e) => error!(?e, ERROR_MSG),
-                    },
-                    Err(e) => error!(?e, ERROR_MSG),
-                },
-                Err(e) => error!(?e, ERROR_MSG),
-            }
-            new
-        },
-        |id| id.clone(),
-    )
+    ID_FILE.clone()
 }
